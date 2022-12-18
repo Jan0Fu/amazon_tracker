@@ -6,7 +6,6 @@ import smtplib
 email = ""
 password = ""
 
-
 url = "https://www.amazon.com/Oculus-Quest-Advanced-All-One-Virtual/dp/B099VMT8VZ/ref=sr_1_3?keywords=oculus+quest+2&qid=1671349190&sprefix=ocul%2Caps%2C341&sr=8-3"
 headers = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.2 Safari/605.1.15",
@@ -20,4 +19,17 @@ price_tag = soup.find(name="span", id="priceblock_ourprice").getText()
 price = float(price_tag.split("$")[1])
 print(price)
 
-smtp = smtplib.SMTP("smtp.gmail.com")
+title = soup.find(id="productTitle").getText().strip()
+print(title)
+buy_price = 380
+
+if price < buy_price:
+    message = f"{title} is now {price}"
+    with smtplib.SMTP("smtp.gmail.com") as connection:
+        connection.starttls()
+        connection.login(user=email, password=password)
+        connection.sendmail(
+            from_addr=email,
+            to_addrs=email,
+            msg=f"Subject:Amazon Price Alert!\n\n{message}\n{url}"
+        )
